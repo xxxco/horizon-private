@@ -36,6 +36,19 @@ class ContentEnricher:
         concurrency = getattr(config, "enrichment_concurrency", 1)
         return max(concurrency, 1)
 
+    def _get_throttle_sec(self) -> float:
+        """Return the configured inter-item throttle, clamped to zero or above.
+
+        Reuses ``ai.throttle_sec`` (the same knob the analysis pass uses) so a
+        single free-tier-friendly setting paces both AI passes. Each item here
+        costs 2+ AI calls (concept extraction + enrichment, sometimes a
+        translation fallback on top), so bursts here are more likely to hit
+        rate limits than the single-call-per-item analysis pass.
+        """
+        config = getattr(self.client, "config", None)
+        throttle_sec = getattr(config, "throttle_sec", 0.0)
+        return max(throttle_sec, 0.0)
+
     async def enrich_batch(self, items: List[ContentItem]) -> None:
         """Enrich items in-place with background knowledge.
 
@@ -43,15 +56,18 @@ class ContentEnricher:
             items: Content items to enrich (modified in-place)
         """
         concurrency = self._get_concurrency()
+        throttle_sec = self._get_throttle_sec()
         semaphore = asyncio.Semaphore(concurrency)
 
-        async def _process(item: ContentItem, progress_task) -> None:
+        async def _process(item: ContentItem, index: int, progress_task) -> None:
             async with semaphore:
                 try:
                     await self._enrich_item(item)
                 except Exception as e:
                     print(f"Error enriching item {item.id}: {e}, falling back to translation")
                     await self._translate_item(item)
+                if throttle_sec > 0 and index < len(items) - 1:
+                    await asyncio.sleep(throttle_sec)
             progress.advance(progress_task)
 
         with Progress(
@@ -63,7 +79,7 @@ class ContentEnricher:
         ) as progress:
             task = progress.add_task("Enriching", total=len(items))
             coros = [
-                _process(item, task) for item in items
+                _process(item, i, task) for i, item in enumerate(items)
             ]
             await asyncio.gather(*coros)
 
