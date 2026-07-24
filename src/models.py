@@ -467,6 +467,7 @@ class EmailConfig(BaseModel):
     recipients: List[str] = Field(default_factory=list)
     password_env: str = "EMAIL_PASSWORD"
     sender_name: str = "Horizon Daily"
+    web_version_url: Optional[str] = None
     subscribe_keyword: str = "SUBSCRIBE"
     unsubscribe_keyword: str = "UNSUBSCRIBE"
     enabled: bool = False

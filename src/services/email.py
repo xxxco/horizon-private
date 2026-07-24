@@ -164,6 +164,14 @@ class EmailManager:
             else f"<pre>{safe_summary}</pre>"
         )
 
+        web_version_banner = ""
+        if self.config.web_version_url:
+            safe_web_url = html.escape(self.config.web_version_url, quote=True)
+            web_version_banner = (
+                f'<a class="web-version" href="{safe_web_url}">'
+                "\U0001f310 View this in your browser</a>"
+            )
+
         html_body = f"""
         <!DOCTYPE html>
         <html>
@@ -186,9 +194,11 @@ class EmailManager:
                 details {{ margin: 8px 0; font-size: 13px; color: #57606a; }}
                 details summary {{ cursor: pointer; color: #0969da; }}
                 .footer {{ margin-top: 32px; font-size: 12px; color: #8b949e; text-align: center; border-top: 1px solid #e5e9ee; padding-top: 16px; }}
+                .web-version {{ display: block; text-align: center; margin: 0 0 20px; padding: 10px; background: #f6f8fa; border-radius: 6px; font-size: 13px; }}
             </style>
         </head>
         <body>
+            {web_version_banner}
             {html_content}
             <div class="footer">
                 <p>Sent by {self.config.sender_name}</p>

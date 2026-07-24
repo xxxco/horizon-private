@@ -68,6 +68,7 @@
     "email_address": "${SENDER_EMAIL}",
     "recipients": ["${HORIZON_RECIPIENT_EMAIL}"],
     "password_env": "EMAIL_PASSWORD",
-    "sender_name": "NEWS Daily"
+    "sender_name": "NEWS Daily",
+    "web_version_url": "https://xxxco.github.io/horizon-private/"
   }
 }
