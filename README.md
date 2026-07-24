@@ -300,7 +300,7 @@ For Gemini, use `GOOGLE_API_KEY`:
 {
   "ai": {
     "provider": "gemini",
-    "model": "gemini-2.0-flash",
+    "model": "gemini-3.6-flash",
     "api_key_env": "GOOGLE_API_KEY"
   }
 }

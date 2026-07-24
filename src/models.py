@@ -103,7 +103,7 @@ AI_PROVIDER_DEFAULTS = {
         "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
     },
     AIProvider.GEMINI: {
-        "model": "gemini-1.5-flash",
+        "model": "gemini-3.6-flash",
         "api_key_env": "GOOGLE_API_KEY",
         "base_url": None,
     },
@@ -364,6 +364,7 @@ class GoogleNewsConfig(BaseModel):
 
     enabled: bool = False
     query: str = "artificial intelligence"
+    queries: List[str] = Field(default_factory=list)
     language: str = "en"  # hl
     country: str = "US"  # gl
     ceid: Optional[str] = None  # when None scraper derives it as "{country}:{language}"
@@ -463,6 +464,7 @@ class EmailConfig(BaseModel):
     smtp_port: int = 465
     smtp_username: Optional[str] = None
     email_address: str
+    recipients: List[str] = Field(default_factory=list)
     password_env: str = "EMAIL_PASSWORD"
     sender_name: str = "Horizon Daily"
     subscribe_keyword: str = "SUBSCRIBE"

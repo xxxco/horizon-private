@@ -69,7 +69,7 @@ Common API key variable names:
 {
   "ai": {
     "provider": "gemini",
-    "model": "gemini-2.0-flash",
+    "model": "gemini-3.6-flash",
     "api_key_env": "GOOGLE_API_KEY",
     "throttle_sec": 0
   }
@@ -556,6 +556,7 @@ Email delivery is optional and disabled unless `email.enabled` is `true`. Horizo
     "imap_server": "imap.qq.com",
     "imap_port": 993,
     "email_address": "xxx@qq.com",
+    "recipients": ["you@example.com"],
     "password_env": "EMAIL_PASSWORD",
     "sender_name": "Horizon Daily",
     "subscribe_keyword": "SUBSCRIBE",
@@ -570,6 +571,8 @@ Email delivery is optional and disabled unless `email.enabled` is `true`. Horizo
 - `imap_enabled`: Turns IMAP subscribe/unsubscribe checks on or off. Set it to `false` for send-only SMTP providers.
 - `imap_server` / `imap_port`: IMAP server used to scan incoming subscription requests when `imap_enabled` is `true`.
 - `email_address`: Sender account and mailbox checked for subscription requests.
+- `recipients`: Optional fixed recipients for every digest. This is useful for a
+  personal digest; subscribers collected through IMAP are included as well.
 - `password_env`: Environment variable containing the email password or app password. Defaults to `EMAIL_PASSWORD`.
 - `sender_name`: Display name shown in sent emails.
 - `subscribe_keyword` / `unsubscribe_keyword`: Keywords Horizon looks for in incoming email subjects.

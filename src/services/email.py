@@ -169,13 +169,23 @@ class EmailManager:
         <html>
         <head>
             <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
             <style>
-                body {{ font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }}
-                h1, h2, h3 {{ color: #2c3e50; }}
-                code {{ background-color: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }}
+                body {{ font-family: -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.7; color: #24292f; max-width: 680px; margin: 0 auto; padding: 24px 20px; background: #ffffff; }}
+                h1 {{ font-size: 22px; color: #1a1a1a; margin: 0 0 12px; }}
+                h2 {{ font-size: 17px; color: #1a1a1a; margin: 32px 0 10px; padding-top: 20px; border-top: 3px solid #0969da; }}
+                h2 a {{ color: #1a1a1a; text-decoration: none; }}
+                p {{ margin: 8px 0; }}
+                ol li {{ margin: 6px 0; }}
+                a {{ color: #0969da; text-decoration: none; }}
+                a:hover {{ text-decoration: underline; }}
+                code {{ background-color: #f0f2f5; padding: 2px 6px; border-radius: 10px; font-family: monospace; font-size: 12px; color: #57606a; }}
                 pre {{ background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }}
-                blockquote {{ border-left: 4px solid #ddd; padding-left: 15px; color: #777; }}
-                .footer {{ margin-top: 40px; font-size: 12px; color: #888; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }}
+                blockquote {{ border-left: 3px solid #0969da; padding: 4px 15px; margin: 0 0 16px; color: #57606a; background: #f6f8fa; border-radius: 0 6px 6px 0; }}
+                hr {{ border: none; border-top: 1px solid #e5e9ee; margin: 20px 0; }}
+                details {{ margin: 8px 0; font-size: 13px; color: #57606a; }}
+                details summary {{ cursor: pointer; color: #0969da; }}
+                .footer {{ margin-top: 32px; font-size: 12px; color: #8b949e; text-align: center; border-top: 1px solid #e5e9ee; padding-top: 16px; }}
             </style>
         </head>
         <body>

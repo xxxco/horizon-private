@@ -178,3 +178,17 @@ def test_max_results_cap() -> None:
     items = asyncio.run(scraper.fetch(_now() - timedelta(days=365)))
 
     assert len(items) == 2
+
+
+def test_multiple_queries_are_fetched_and_labeled() -> None:
+    client = _mock_client(_feed(_item("Foo - Publisher", "https://example.com/a")))
+    config = GoogleNewsConfig(
+        enabled=True, queries=["site:example.com", "site:example.org"]
+    )
+    scraper = GoogleNewsScraper(config, client)
+
+    items = asyncio.run(scraper.fetch(_now() - timedelta(hours=6)))
+
+    assert client.get.call_count == 2
+    assert len(items) == 1  # The same article returned by both queries is deduplicated.
+    assert items[0].metadata["gn_query"] == "site:example.com"

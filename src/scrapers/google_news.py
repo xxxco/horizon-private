@@ -72,43 +72,45 @@ class GoogleNewsScraper(BaseScraper):
         if not self.gn_config.enabled:
             return []
 
-        base_query = (self.gn_config.query or "").strip()
-        if not base_query:
+        configured_queries = self.gn_config.queries or [self.gn_config.query]
+        queries = [query.strip() for query in configured_queries if query and query.strip()]
+        if not queries:
             return []
-
-        query = f"{base_query} {self._time_operator(since)}"
 
         ceid = self.gn_config.ceid or f"{self.gn_config.country}:{self.gn_config.language}"
-        params: dict[str, Any] = {
-            "q": query,
-            "hl": self.gn_config.language,
-            "gl": self.gn_config.country,
-            "ceid": ceid,
-        }
+        items: List[ContentItem] = []
+        seen_ids: set[str] = set()
+        for base_query in queries:
+            query = f"{base_query} {self._time_operator(since)}"
+            params: dict[str, Any] = {
+                "q": query,
+                "hl": self.gn_config.language,
+                "gl": self.gn_config.country,
+                "ceid": ceid,
+            }
 
-        try:
-            response = await self.client.get(
-                self.BASE_URL, params=params, follow_redirects=True
-            )
-            response.raise_for_status()
+            try:
+                response = await self.client.get(
+                    self.BASE_URL, params=params, follow_redirects=True
+                )
+                response.raise_for_status()
+                feed = feedparser.parse(response.text)
 
-            feed = feedparser.parse(response.text)
-
-            items: List[ContentItem] = []
-            for entry in feed.entries:
-                if len(items) >= self.gn_config.max_results:
-                    break
-                item = self._entry_to_item(entry)
-                if item is not None:
-                    items.append(item)
-            return items
-
-        except httpx.HTTPError as exc:
-            logger.warning("Error fetching Google News feed: %s", exc)
-            return []
-        except Exception as exc:
-            logger.warning("Error parsing Google News feed: %s", exc)
-            return []
+                query_items = 0
+                for entry in feed.entries:
+                    if query_items >= self.gn_config.max_results:
+                        break
+                    item = self._entry_to_item(entry, query=base_query)
+                    if item is not None:
+                        query_items += 1
+                        if item.id not in seen_ids:
+                            items.append(item)
+                            seen_ids.add(item.id)
+            except httpx.HTTPError as exc:
+                logger.warning("Error fetching Google News feed for %r: %s", base_query, exc)
+            except Exception as exc:
+                logger.warning("Error parsing Google News feed for %r: %s", base_query, exc)
+        return items
 
     def _time_operator(self, since: datetime) -> str:
         """Build the Google News time operator from ``since``.
@@ -126,7 +128,7 @@ class GoogleNewsScraper(BaseScraper):
             return f"when:{hours}h"
         return f"after:{since_utc.strftime('%Y-%m-%d')}"
 
-    def _entry_to_item(self, entry: Any) -> Optional[ContentItem]:
+    def _entry_to_item(self, entry: Any, query: Optional[str] = None) -> Optional[ContentItem]:
         """Map one Google News RSS entry into a ContentItem.
 
         Returns None when the entry has no title/link or an unparseable
@@ -152,7 +154,7 @@ class GoogleNewsScraper(BaseScraper):
             entry_hash = hashlib.sha256(str(entry_id).encode("utf-8")).hexdigest()[:16]
 
             meta = {
-                "gn_query": self.gn_config.query,
+                "gn_query": query if query is not None else self.gn_config.query,
                 "source_name": source_name,
                 "category": self.gn_config.category,
             }

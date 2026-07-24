@@ -1,0 +1,73 @@
+{
+  "version": "1.0",
+  "ai": {
+    "provider": "gemini",
+    "model": "gemini-flash-lite-latest",
+    "api_key_env": "GOOGLE_API_KEY",
+    "temperature": 0.3,
+    "max_tokens": 4096,
+    "throttle_sec": 21,
+    "analysis_concurrency": 1,
+    "enrichment_concurrency": 1,
+    "languages": ["en", "zh"]
+  },
+  "sources": {
+    "github": [],
+    "hackernews": {
+      "enabled": false
+    },
+    "rss": [],
+    "reddit": {
+      "enabled": false,
+      "subreddits": [],
+      "users": []
+    },
+    "telegram": {
+      "enabled": false,
+      "channels": []
+    },
+    "ossinsight": {
+      "enabled": false
+    },
+    "google_news": {
+      "enabled": true,
+      "queries": [
+        "site:bloomberg.com",
+        "site:cnbc.com",
+        "site:cnn.com",
+        "site:forbes.com",
+        "site:foxnews.com",
+        "site:politico.com",
+        "site:thehill.com",
+        "site:nytimes.com",
+        "site:washingtonpost.com",
+        "site:finance.yahoo.com"
+      ],
+      "language": "en",
+      "country": "US",
+      "max_results": 5,
+      "category": "news"
+    }
+  },
+  "filtering": {
+    "ai_score_threshold": 6.0,
+    "time_window_hours": 24,
+    "max_items": 100,
+    "category_groups": {},
+    "default_group": "other",
+    "default_group_limit": null
+  },
+  "email": {
+    "enabled": true,
+    "imap_enabled": false,
+    "smtp_server": "${SMTP_SERVER}",
+    "smtp_port": 465,
+    "smtp_username": "${SMTP_USERNAME}",
+    "imap_server": "unused",
+    "imap_port": 993,
+    "email_address": "${SENDER_EMAIL}",
+    "recipients": ["${HORIZON_RECIPIENT_EMAIL}"],
+    "password_env": "EMAIL_PASSWORD",
+    "sender_name": "NEWS Daily"
+  }
+}

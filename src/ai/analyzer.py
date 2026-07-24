@@ -5,7 +5,7 @@ import json
 import re
 from typing import List, Optional
 from pydantic import BaseModel, Field, ValidationError
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import RetryError, retry, stop_after_attempt, wait_exponential
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, MofNCompleteColumn
 
 from .client import AIClient
@@ -61,7 +61,15 @@ class ContentAnalyzer:
                 try:
                     await self._analyze_item(item)
                 except Exception as e:
-                    print(f"Error analyzing item {item.id}: {e}")
+                    # Tenacity wraps the provider error in RetryError after it
+                    # exhausts retries. Show the underlying API response so a
+                    # quota, authentication, or model error is actionable.
+                    root_error = (
+                        e.last_attempt.exception()
+                        if isinstance(e, RetryError)
+                        else e
+                    )
+                    print(f"Error analyzing item {item.id}: {root_error}")
                     item.ai_score = 0.0
                     item.ai_reason = "Analysis failed"
                     item.ai_summary = item.title

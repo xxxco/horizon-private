@@ -20,41 +20,40 @@ Respond with valid JSON only:
 
 If there are no duplicates at all, return: {{"duplicates": []}}"""
 
-CONTENT_ANALYSIS_SYSTEM = """You are an expert content curator helping filter important technical and academic information.
+CONTENT_ANALYSIS_SYSTEM = """You are an expert news editor helping curate an important daily briefing on politics, business, finance, and world affairs for a general reader.
 
-Score content on a 0-10 scale based on importance and relevance:
+Score content on a 0-10 scale based on importance and newsworthiness:
 
-**9-10: Groundbreaking** - Major breakthroughs, paradigm shifts, or highly significant announcements
-- New major version releases of widely-used technologies
-- Significant research breakthroughs
-- Important industry-changing announcements
+**9-10: Major** - Events with broad, lasting impact
+- Major policy decisions, elections, or geopolitical developments
+- Market-moving economic or financial news (rate decisions, major earnings, crises)
+- Significant breaking news affecting large numbers of people
 
 **7-8: High Value** - Important developments worth immediate attention
-- Interesting technical deep-dives
-- Novel approaches to known problems
-- Insightful analysis or commentary
-- Valuable tools or libraries
+- Substantive political or economic analysis and reporting
+- Notable corporate or industry developments
+- Consequential court rulings, legislation, or regulatory actions
 
 **5-6: Interesting** - Worth knowing but not urgent
-- Incremental improvements
-- Useful tutorials
-- Moderate community interest
+- Ongoing story updates without major new developments
+- Regional or sector-specific news of moderate impact
+- Opinion/analysis pieces offering a useful perspective
 
 **3-4: Low Priority** - Generic or routine content
-- Minor updates
-- Common knowledge
-- Overly promotional content
+- Routine corporate announcements
+- Minor personnel or scheduling news
+- Overly promotional or listicle-style content
 
-**0-2: Noise** - Not relevant or low quality
-- Spam or purely promotional
-- Off-topic content
-- Trivial updates
+**0-2: Noise** - Not newsworthy or low quality
+- Spam or purely promotional content
+- Celebrity gossip, lifestyle filler, or clickbait
+- Trivial or highly localized items with no broader relevance
 
 Consider:
-- Technical depth and novelty
-- Potential impact on the field
-- Quality of writing/presentation
-- Relevance to software engineering, AI/ML, and systems research
+- Scale of impact: how many people or how much of the economy/political system is affected
+- Timeliness and significance of the underlying event
+- Quality and credibility of the reporting
+- Relevance to politics, business, finance, and world affairs
 - Community discussion quality: insightful comments, diverse viewpoints, and debates increase value
 - Engagement signals: high upvotes/favorites with substantive discussion indicate community-validated importance
 """

@@ -297,7 +297,7 @@ Geminiの場合は`GOOGLE_API_KEY`を使用します。
 {
   "ai": {
     "provider": "gemini",
-    "model": "gemini-2.0-flash",
+    "model": "gemini-3.6-flash",
     "api_key_env": "GOOGLE_API_KEY"
   }
 }
