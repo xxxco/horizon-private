@@ -2,9 +2,13 @@ name: Daily Horizon Summary
 
 on:
   schedule:
-    # GitHub scheduled workflows use UTC. 20:00 UTC is 04:00 Asia/Shanghai;
-    # this intentionally runs early to offset the observed schedule delay.
-    - cron: '0 23 * * *'
+    # GitHub scheduled workflows use UTC and don't adjust for daylight saving.
+    # 01:07 UTC = 21:07 US Eastern during EDT (UTC-4, roughly mid-March to
+    # early November). During EST (UTC-5, winter) this drifts to 20:07 ET -
+    # switch to '7 2 * * *' then to hold 21:07 ET, or update twice a year.
+    # Minute offset (:07) avoids the top-of-hour queue where GitHub Actions
+    # scheduled runs are most often delayed.
+    - cron: '7 1 * * *'
   workflow_dispatch:      # Allow manual trigger
 
 jobs:
