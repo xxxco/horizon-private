@@ -11,7 +11,7 @@ import re
 import sys
 import os
 from typing import List, Optional
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt, wait_exponential, RetryError
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, MofNCompleteColumn
 from ddgs import DDGS
 
@@ -22,6 +22,20 @@ from .prompts import (
 )
 from .utils import parse_json_response
 from ..models import ContentItem
+
+
+def _root_cause(e: Exception) -> Exception:
+    """Unwrap a tenacity RetryError to the exception that actually caused it.
+
+    RetryError's own message is just a repr of the last Future, which hides
+    the real error (e.g. a 429 vs. an auth failure) behind text like
+    ``RetryError[<Future at 0x... state=finished raised ClientError>]``.
+    """
+    if isinstance(e, RetryError) and e.last_attempt is not None:
+        inner = e.last_attempt.exception()
+        if inner is not None:
+            return inner
+    return e
 
 
 class ContentEnricher:
@@ -64,7 +78,11 @@ class ContentEnricher:
                 try:
                     await self._enrich_item(item)
                 except Exception as e:
-                    print(f"Error enriching item {item.id}: {e}, falling back to translation")
+                    cause = _root_cause(e)
+                    print(
+                        f"Error enriching item {item.id}: {type(cause).__name__}: {cause}, "
+                        "falling back to translation"
+                    )
                     await self._translate_item(item)
                 if throttle_sec > 0 and index < len(items) - 1:
                     await asyncio.sleep(throttle_sec)
@@ -280,7 +298,8 @@ class ContentEnricher:
         try:
             await self._translate_item_attempt(item)
         except Exception as e:
+            cause = _root_cause(e)
             print(
-                f"Error translating item {item.id}: {e}, "
+                f"Error translating item {item.id}: {type(cause).__name__}: {cause}, "
                 "item will keep its original English title/summary in the zh digest"
             )

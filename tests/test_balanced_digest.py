@@ -122,6 +122,28 @@ def test_duplicate_category_warns_and_first_group_wins() -> None:
     assert "using 'first'" in orchestrator.console.export_text()
 
 
+def test_merge_topic_duplicates_skips_malformed_group_indices(monkeypatch) -> None:
+    orchestrator = HorizonOrchestrator.__new__(HorizonOrchestrator)
+    orchestrator.config = SimpleNamespace(ai=SimpleNamespace())
+    orchestrator.console = Console(record=True)
+
+    class FakeAIClient:
+        async def complete(self, **kwargs):  # type: ignore[no-untyped-def]
+            return "{}"
+
+    monkeypatch.setattr("src.orchestrator.create_ai_client", lambda _config: FakeAIClient())
+    monkeypatch.setattr(
+        "src.ai.utils.parse_json_response",
+        lambda _response: {"duplicates": [[[0, 1], 2]]},
+    )
+
+    items = [make_item("first", 9.0, None), make_item("second", 8.0, None)]
+
+    result = asyncio.run(orchestrator.merge_topic_duplicates(items, log=False))
+
+    assert [item.id for item in result] == ["first", "second"]
+
+
 @pytest.mark.parametrize(
     "kwargs",
     [

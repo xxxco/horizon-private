@@ -606,16 +606,30 @@ class HorizonOrchestrator:
             return items
 
         # Build a set of indices to drop (all non-primary duplicates)
+        def _coerce_index(value: object) -> Optional[int]:
+            if isinstance(value, bool):
+                return None
+            if isinstance(value, int):
+                return value
+            if isinstance(value, str):
+                stripped = value.strip()
+                if stripped.isdigit() or (stripped.startswith("-") and stripped[1:].isdigit()):
+                    return int(stripped)
+            return None
+
         drop_indices: set[int] = set()
         for group in duplicate_groups:
             if not isinstance(group, list) or len(group) < 2:
                 continue
-            primary_idx = group[0]
-            if primary_idx < 0 or primary_idx >= len(items):
+
+            primary_idx = _coerce_index(group[0])
+            if primary_idx is None or primary_idx < 0 or primary_idx >= len(items):
                 continue
+
             primary = items[primary_idx]
-            for dup_idx in group[1:]:
-                if not isinstance(dup_idx, int) or dup_idx < 0 or dup_idx >= len(items):
+            for dup_idx_value in group[1:]:
+                dup_idx = _coerce_index(dup_idx_value)
+                if dup_idx is None or dup_idx < 0 or dup_idx >= len(items):
                     continue
                 if dup_idx == primary_idx:
                     continue
